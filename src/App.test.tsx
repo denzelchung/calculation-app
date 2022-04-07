@@ -1,5 +1,5 @@
-import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
+
 import App from "./App";
 
 test("renders app", () => {
@@ -13,7 +13,7 @@ test("renders app", () => {
   expect(screen.queryByText(/Results/i)).not.toBeInTheDocument();
 });
 
-test("renders results on add", () => {
+test("renders results on add", async () => {
   render(<App />);
   const input1: HTMLInputElement = screen.getByLabelText(/Input 1/i);
   const input2: HTMLInputElement = screen.getByLabelText(/Input 2/i);
@@ -35,11 +35,12 @@ test("renders results on add", () => {
       cancelable: true,
     })
   );
-  expect(screen.getByText(/Results/i)).toBeInTheDocument();
+
+  await screen.findByTestId("result");
   expect(screen.getByTestId("result").textContent).toBe("99");
 });
 
-test("renders results on subtract", () => {
+test("renders results on subtract", async () => {
   render(<App />);
   const input1: HTMLInputElement = screen.getByLabelText(/Input 1/i);
   const input2: HTMLInputElement = screen.getByLabelText(/Input 2/i);
@@ -50,9 +51,9 @@ test("renders results on subtract", () => {
   expect(input1.value).toBe("8");
 
   fireEvent.change(input2, {
-    target: { value: "100" },
+    target: { value: "100.5" },
   });
-  expect(input2.value).toBe("100");
+  expect(input2.value).toBe("100.5");
 
   fireEvent(
     screen.getByText("Subtract"),
@@ -61,6 +62,7 @@ test("renders results on subtract", () => {
       cancelable: true,
     })
   );
-  expect(screen.getByText(/Results/i)).toBeInTheDocument();
-  expect(screen.getByTestId("result").textContent).toBe("-92");
+
+  await screen.findByTestId("result");
+  expect(screen.getByTestId("result").textContent).toBe("-92.5");
 });

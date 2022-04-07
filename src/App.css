@@ -16,3 +16,7 @@ label + label,
 button + button {
   margin: 16px;
 }
+
+.Error-label {
+  color: #dd2222;
+}

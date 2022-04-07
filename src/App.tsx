@@ -1,10 +1,18 @@
 import { useState } from "react";
 
 import "./App.css";
+import axios from "./utils/axios";
+
+// Maps to API endpoint
+enum CalculationType {
+  Add = "add",
+  Subtract = "subtract",
+}
 
 function App() {
   const [inputs, setInputs] = useState({ number1: "0", number2: "0" });
   const [result, setResult] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   function onInputChange(event: { target: HTMLInputElement }) {
     setInputs((state) => ({
@@ -13,12 +21,31 @@ function App() {
     }));
   }
 
-  function onAdd() {
-    setResult(parseInt(inputs.number1) + parseInt(inputs.number2));
+  function getNumber(num: string) {
+    return num === "" ? 0 : parseFloat(num);
   }
 
-  function onSubtract() {
-    setResult(parseInt(inputs.number1) - parseInt(inputs.number2));
+  async function onCalculate(calculationType: CalculationType) {
+    setError(null);
+    try {
+      const result = await axios.post(
+        calculationType,
+        JSON.stringify({
+          number1: getNumber(inputs.number1),
+          number2: getNumber(inputs.number2),
+        }),
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+      setResult(result.data);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      }
+    }
   }
 
   return (
@@ -44,14 +71,17 @@ function App() {
           />
         </label>
 
-        <button onClick={onAdd}>Add</button>
-        <button onClick={onSubtract}>Subtract</button>
+        <button onClick={() => onCalculate(CalculationType.Add)}>Add</button>
+        <button onClick={() => onCalculate(CalculationType.Subtract)}>
+          Subtract
+        </button>
 
-        {result != null && (
+        {result != null && !error && (
           <div>
             Results: <span data-testid="result">{result}</span>
           </div>
         )}
+        {error && <div className="Error-label">{error}</div>}
       </div>
     </div>
   );
