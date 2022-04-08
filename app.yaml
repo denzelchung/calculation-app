@@ -1,0 +1,17 @@
+runtime: nodejs14
+env: standard
+default_expiration: "365d"
+handlers:
+  # Serve all static files with url ending with a file extension
+  - url: /(.*\..+)$
+    static_files: build/\1
+    upload: build/(.*\..+)$
+  # Catch all handler to index.html
+  - url: /.*
+    static_files: build/index.html
+    upload: build/index.html
+    http_headers:
+      Strict-Transport-Security: max-age=31536000; includeSubDomains
+      Content-Security-Policy: default-src 'self'; connect-src 'self' l65mcxkibg.execute-api.ap-southeast-1.amazonaws.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'
+      X-Content-Type-Options: nosniff
+      X-Frame-Options: DENY
